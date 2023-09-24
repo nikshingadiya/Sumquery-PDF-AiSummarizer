@@ -47,7 +47,7 @@ openai.api_key = os.environ["OPENAI_API_KEY"]
 page_bg = f"""
 <style>
 [data-testid="stSidebar"] {{
-background-color:#EFEFE8;
+background-color:#0d0d0c;
 
 }}
 
@@ -62,7 +62,7 @@ st.markdown(page_bg,unsafe_allow_html=True)
 # Sidebar contents
 with st.sidebar:
 
-    image = Image.open('Sumquiry.png')
+    image = Image.open('download.jpeg')
     st.image(image)
     st.markdown("<h3 style='text-align: left'> Intelligent PDF Summarizer and Inquiry Companion </h3>", unsafe_allow_html= True)
     st.markdown("""
@@ -73,7 +73,7 @@ with st.sidebar:
     """, unsafe_allow_html=True)
     
     add_vertical_space(5)
-    st.markdown("<p> Made by <a href='https://omaresguerra.github.io'>Omar Esguerra</a> </p>", unsafe_allow_html=True)
+    st.markdown("<p> Made by <a href='https://nikshingadiya.github.io/'>nikhil shingadiya</a> </p>", unsafe_allow_html=True)
 
 # Clear input text
 def clear_text():
