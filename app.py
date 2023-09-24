@@ -136,7 +136,7 @@ if pdf is not None:
 
     # create embeddings
     # embeddings = OpenAIEmbeddings(openai_api_key=os.environ["OPENAI_API_KEY"])
-    knowledge_base =get_vectorstore(chunks)
+    knowledge_base =get_vectorstore_prod(chunks)
 
     # show user input
     user_question = st.text_input("Ask a question about your PDF", key="input")
