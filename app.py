@@ -80,7 +80,7 @@ st.markdown(page_bg,unsafe_allow_html=True)
 # Sidebar contents
 with st.sidebar:
 
-    image = Image.open('download.jpeg')
+    image = Image.open('ai_summarizer.jpeg')
     st.image(image)
     st.markdown("<h3 style='text-align: left'> Intelligent PDF Summarizer and Inquiry Companion </h3>", unsafe_allow_html= True)
     if not openai_api_key:
@@ -88,10 +88,7 @@ with st.sidebar:
         openai_api_key=password
    
     st.markdown("""
-            <br><p style='text-align: left;'>With Sumquiry, you can quickly obtain concise and accurate summaries of lengthy documents, saving valuable time. \
-            But that's not all - you can ask detailed questions about the content and receive insightful responses, \
-            transforming your research experience into an interactive and efficient journey. Say goodbye to information overload \
-            and hello to a seamless exploration of knowledge with Sumquiry as your trusted companion.</p>
+            Sumquiry is your go-to tool for fast, clear summaries of long documents. It saves you time and makes research interactive. You can even ask specific questions and get smart answers. No more drowning in information – Sumquiry makes learning a breeze!</p>
     """, unsafe_allow_html=True)
     
     add_vertical_space(5)
