@@ -20,6 +20,23 @@ import openai
 
 st.set_page_config(page_title="Sumquiry ", page_icon=":robot:")
 from dotenv import load_dotenv
+load_dotenv()  # take environment variables from .env.
+
+openai_api_key = os.environ.get("OPENAI_API_KEY",None)
+def get_vectorstore_prod(text_chunks, cache_file = "knowledge_base.pkl"):
+    
+        # If the pickle file doesn't exist, compute the knowledge base
+        start_time = time.time()
+        embeddings = HuggingFaceEmbeddings()
+        knowledge_base = FAISS.from_texts(text_chunks, embeddings)
+        end_time = time.time()
+        elapsed_time = end_time - start_time
+        print("Computed knowledge_base in:", elapsed_time)
+        
+        # Save the computed knowledge_base to the pickle file
+
+        return knowledge_base
+
 def get_vectorstore(text_chunks, cache_file = "knowledge_base.pkl"):
     try:
         # Try to load the knowledge base from the pickle file
@@ -42,9 +59,8 @@ def get_vectorstore(text_chunks, cache_file = "knowledge_base.pkl"):
 
     return knowledge_base
 
-load_dotenv()  # take environment variables from .env.
 
-
+  
 
 page_bg = f"""
 <style>
@@ -67,6 +83,10 @@ with st.sidebar:
     image = Image.open('download.jpeg')
     st.image(image)
     st.markdown("<h3 style='text-align: left'> Intelligent PDF Summarizer and Inquiry Companion </h3>", unsafe_allow_html= True)
+    if not openai_api_key:
+        password = st.text_input("Enter a OPEN_API_KEY", type="password") 
+        openai_api_key=password
+   
     st.markdown("""
             <br><p style='text-align: left;'>With Sumquiry, you can quickly obtain concise and accurate summaries of lengthy documents, saving valuable time. \
             But that's not all - you can ask detailed questions about the content and receive insightful responses, \
@@ -76,12 +96,11 @@ with st.sidebar:
     
     add_vertical_space(5)
     st.markdown("<p> Made by <a href='https://nikshingadiya.github.io/'>Nikhil Shingadiya</a> </p>", unsafe_allow_html=True)
-    openai_api_key = os.environ.get("OPENAI_API_KEY",None)
-    print(openai_api_key)
+
   
-    if not openai_api_key:
-        password = st.text_input("Enter a OPEN_API_KEY", type="password") 
-        openai_api_key=password
+    
+
+
 
 # Clear input text
 def clear_text():
