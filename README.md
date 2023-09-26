@@ -7,4 +7,4 @@ With Sumquiry, you can quickly obtain concise and accurate summaries of lengthy 
 
 Built with [LangChain](https://github.com/hwchase17/langchain) and deployed using [Streamlit](https://github.com/streamlit/streamlit).
 
-Website App: https://sumquiry-pdf-summarizer.streamlit.app/
+Website App:https://sumquery-pdf-aisummarizer-dzyq3hgwprog2fweqvtonr.streamlit.app/
