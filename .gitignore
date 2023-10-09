@@ -2,3 +2,5 @@ venv
 .vscode
 *.env
 volumes
+*.pkl
+.streamlit

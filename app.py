@@ -16,6 +16,8 @@ from langchain.callbacks import get_openai_callback
 from langchain.chains.summarize import load_summarize_chain
 from langchain.docstore.document import Document
 
+
+
 st.set_page_config(page_title="Sumquiry ", page_icon=":robot:")
 from dotenv import load_dotenv
 def get_vectorstore(text_chunks, cache_file = "knowledge_base.pkl"):
@@ -125,5 +127,10 @@ if pdf is not None:
         chain = load_qa_chain(llm, chain_type="stuff")
         with get_openai_callback() as cb:
             response = chain.run(input_documents=docs, question=user_question)
-            print(cb)
+            print(type(cb))
             st.write(response)
+            st.write(f"Total Tokens: {cb.total_tokens}" f", Prompt Tokens: {cb.prompt_tokens}" f", Completion Tokens: {cb.completion_tokens}" f", Total Cost (USD): ${cb.total_cost}")
+
+            # response_tokens = cb['usage']['total_tokens']
+            # st.write(f"User Token Limit: {user_question_tokens}")
+            # st.write(f"Total Tokens Used in Response: {response_tokens}")
