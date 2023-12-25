@@ -3,23 +3,42 @@ from streamlit_extras.add_vertical_space import add_vertical_space
 import time
 from PyPDF2 import PdfReader
 from PIL import Image
-import openai
+
 import os
 import pickle
-from langchain.text_splitter import CharacterTextSplitter
-from langchain.embeddings.openai import OpenAIEmbeddings
+
+# from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.embeddings.huggingface import HuggingFaceEmbeddings
+from langchain.text_splitter import CharacterTextSplitter
 from langchain.vectorstores import FAISS
 from langchain.chains.question_answering import load_qa_chain
 from langchain.llms import OpenAI
 from langchain.callbacks import get_openai_callback
 from langchain.chains.summarize import load_summarize_chain
 from langchain.docstore.document import Document
+import openai
 
 
 
 st.set_page_config(page_title="Sumquiry ", page_icon=":robot:")
 from dotenv import load_dotenv
+load_dotenv()  # take environment variables from .env.
+
+openai_api_key = os.environ.get("OPENAI_API_KEY",None)
+def get_vectorstore_prod(text_chunks, cache_file = "knowledge_base.pkl"):
+    
+        # If the pickle file doesn't exist, compute the knowledge base
+        start_time = time.time()
+        embeddings = HuggingFaceEmbeddings()
+        knowledge_base = FAISS.from_texts(text_chunks, embeddings)
+        end_time = time.time()
+        elapsed_time = end_time - start_time
+        print("Computed knowledge_base in:", elapsed_time)
+        
+        # Save the computed knowledge_base to the pickle file
+
+        return knowledge_base
+
 def get_vectorstore(text_chunks, cache_file = "knowledge_base.pkl"):
     try:
         # Try to load the knowledge base from the pickle file
@@ -42,9 +61,8 @@ def get_vectorstore(text_chunks, cache_file = "knowledge_base.pkl"):
 
     return knowledge_base
 
-load_dotenv()  # take environment variables from .env.
 
-openai.api_key = os.environ["OPENAI_API_KEY"]
+  
 
 page_bg = f"""
 <style>
@@ -67,11 +85,12 @@ with st.sidebar:
     image = Image.open('download.jpeg')
     st.image(image)
     st.markdown("<h3 style='text-align: left'> Intelligent PDF Summarizer and Inquiry Companion </h3>", unsafe_allow_html= True)
+    if not openai_api_key:
+        password = st.text_input("Enter a OPEN_API_KEY", type="password") 
+        openai_api_key=password
+   
     st.markdown("""
-            <br><p style='text-align: left;'>With Sumquiry, you can quickly obtain concise and accurate summaries of lengthy documents, saving valuable time. \
-            But that's not all - you can ask detailed questions about the content and receive insightful responses, \
-            transforming your research experience into an interactive and efficient journey. Say goodbye to information overload \
-            and hello to a seamless exploration of knowledge with Sumquiry as your trusted companion.</p>
+            Sumquiry is your go-to tool for fast, clear summaries of long documents. It saves you time and makes research interactive. You can even ask specific questions and get smart answers. No more drowning in information – Sumquiry makes learning a breeze!</p>
     """, unsafe_allow_html=True)
     
     add_vertical_space(5)
@@ -104,7 +123,7 @@ if pdf is not None:
       
     # create docs
     docs = [Document(page_content=t) for t in chunks[:3]]
-    llm = OpenAI(temperature=0, openai_api_key=os.environ["OPENAI_API_KEY"])
+    llm = OpenAI(temperature=0, openai_api_key=openai_api_key)
 
     # show summarize doc
     chain = load_summarize_chain(llm, chain_type="map_reduce")
@@ -114,7 +133,7 @@ if pdf is not None:
 
     # create embeddings
     # embeddings = OpenAIEmbeddings(openai_api_key=os.environ["OPENAI_API_KEY"])
-    knowledge_base =get_vectorstore(chunks)
+    knowledge_base =get_vectorstore_prod(chunks)
 
     # show user input
     user_question = st.text_input("Ask a question about your PDF", key="input")

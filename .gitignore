@@ -3,4 +3,6 @@ venv
 *.env
 volumes
 *.pkl
+volumes
+*.pkl
 .streamlit
