@@ -9,7 +9,7 @@ import pickle
 
 # from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.embeddings.huggingface import HuggingFaceEmbeddings
-from langchain.text_splitter import CharacterTextSplitter
+from langchain.text_splitter import CharacterTextSplitter,RecursiveCharacterTextSplitter
 from langchain.vectorstores import FAISS
 from langchain.chains.question_answering import load_qa_chain
 from langchain.llms import OpenAI
@@ -17,7 +17,20 @@ from langchain.callbacks import get_openai_callback
 from langchain.chains.summarize import load_summarize_chain
 from langchain.docstore.document import Document
 import openai
+from dotenv import load_dotenv
+load_dotenv()
 
+from vectordb.db_operation.milvus import  MilvusTextVectorStore
+
+uri=os.environ.get("uri")
+token=os.environ.get("token")
+MILVUS_COLLECTION_NAME=os.environ.get("MILVUS_COLLECTION_NAME")
+VECTOR_DIMENSION=os.environ.get("VECTOR_DIMENSION")
+milvus_text_vector_store = MilvusTextVectorStore(uri, token, MILVUS_COLLECTION_NAME, VECTOR_DIMENSION)
+
+# Connect to Milvus and define the collection
+milvus_text_vector_store.connect_to_milvus()
+milvus_text_vector_store.define_milvus_collection()
 
 
 st.set_page_config(page_title="Sumquiry ", page_icon=":robot:")
@@ -104,6 +117,8 @@ st.header("Sumquiry")
 # upload file
 pdf = st.file_uploader("Upload your PDF", type="pdf")
 
+
+print(milvus_text_vector_store.row_query())
 # extract the text
 if pdf is not None:
     pdf_reader = PdfReader(pdf)
@@ -112,16 +127,18 @@ if pdf is not None:
         text += page.extract_text()
     
     # split into chunks
-    text_splitter = CharacterTextSplitter(
-    separator="\n",
-    chunk_size=1000,
-    chunk_overlap=200,
-    length_function=len
+    text_splitter = RecursiveCharacterTextSplitter(
+    # Set a really small chunk size, just to show.
+    chunk_size = 1000,
+    chunk_overlap  = 200,
+    length_function = len,
+    is_separator_regex = False,
     )
 
     chunks = text_splitter.split_text(text)
-      
+    
     # create docs
+    milvus_text_vector_store.pdf_vectorstore_with_text_and_auto_increment(pdf.name,chunks)
     docs = [Document(page_content=t) for t in chunks[:3]]
     llm = OpenAI(temperature=0, openai_api_key=openai_api_key)
 
@@ -133,7 +150,7 @@ if pdf is not None:
 
     # create embeddings
     # embeddings = OpenAIEmbeddings(openai_api_key=os.environ["OPENAI_API_KEY"])
-    knowledge_base =get_vectorstore_prod(chunks)
+    knowledge_base =get_vectorstore(chunks)
 
     # show user input
     user_question = st.text_input("Ask a question about your PDF", key="input")
