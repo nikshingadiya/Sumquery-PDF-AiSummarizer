@@ -6,3 +6,4 @@ volumes
 volumes
 *.pkl
 .streamlit
+*.json
